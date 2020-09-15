@@ -7,8 +7,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.jsoup.helper.Validate;
 import sun.invoke.empty.Empty;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
@@ -29,16 +31,38 @@ public class BlanchetteBot
     }
     public static void Recherche(int exploration,String url,String Repertoire){
         Document doc = null;
+        Dossier(Repertoire);
         try {
             doc = Jsoup.connect(url).get();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Element link = doc.select("a").first();
-        String absHref = link.attr("abs:href");
-        System.out.println(absHref);
-
+        Elements links = doc.select("a[href]");
+        System.out.println(url);
+        if (exploration > 0){
+            for (Element link : links) {
+                System.out.println(link.attr("abs:href"));
+                if (exploration > 1){
+                    for (int i = 0; i < exploration; i++) {
+                        TestdeRecherche(link.attr("abs:href"));
+                    }
+                }
+            }
+        }
     }
+    public static void TestdeRecherche(String url){
+        Document doc = null;
+        try {
+            doc = Jsoup.connect(url).get();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Elements links = doc.select("a[href]");
+        for (Element link : links) {
+            System.out.println(link.attr("abs:href"));
+        }
+    }
+
     public static boolean ErreurSpecifique(int exploration,String url,String Repertoire){
         if (exploration < 0 && url == null && Repertoire == null ){
             ErreurGeneral();
@@ -79,5 +103,14 @@ public class BlanchetteBot
                 "- Une profondeur compris entre 0 et 99" + Newligne +
                 "- Une url valide du site à explorer (Exemple https://departement-info-cem.github.io/3N5-Prog3/accueil.html)" + Newligne +
                 "- Un dossier pour pouvoir sauvegarder les pages exploré ainsi que les autres informations (Exemple ./Temp/)");
+    }
+
+    public static void Dossier(String Repertoire){
+        File Dossier = new File(Repertoire);
+
+        if (Dossier.exists()) {
+            Dossier.delete();
+        }
+        Dossier.mkdir();
     }
 }
