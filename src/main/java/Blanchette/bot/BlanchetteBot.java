@@ -26,9 +26,7 @@ public class BlanchetteBot
 
     public static void main( String[] args )
     {
-
          Donnees(args);
-        //UrlMalforme(args);
     }
 
 
@@ -146,59 +144,6 @@ public class BlanchetteBot
         return Listedesites2;
     }
 
-    public static void UrlMalforme(String[] args){
-        try {
-            String url= args[1];
-            HashMap<String, String> h = new HashMap<>();
-            Document doc = Jsoup.connect(url).get();
-
-
-            //  Links in page
-            List url_array = new ArrayList();
-            int i=0;
-            url_array.add(url);
-
-            while((i<=h.size())){
-                try{
-                    url = url_array.get(i).toString();
-                    doc = Jsoup.connect(url).get();
-                    Elements links = doc.select("a[href]");
-                    Elements links2 = doc.select("body");
-
-                    for (Element link : links) {
-                        try {
-                            URL url2 = new URL(link.toString());
-                            URLConnection conn = url2.openConnection();
-                            conn.connect();
-                        } catch (MalformedURLException e) {
-                            System.out.println(e);
-                            // the URL is not in a valid form
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            // the connection couldn't be established
-                        }
-                       String res= h.putIfAbsent(link.attr("href"), link.text());
-                        for (Element link2 : links2){
-                            //if (res==null && Jsoup.isValid(link2.empty().text(), Whitelist.none())){
-                                url_array.add(link.attr("href"));
-                                System.out.println("\nURL: " + link.attr("href"));
-                           // }
-                        }
-                    }
-                }catch(Exception e){
-
-                }
-
-                i++;
-
-            }
-        } catch (Exception e) {
-
-        }
-
-
-
-    }
 
     public static boolean isURL(String url) {
         try {
