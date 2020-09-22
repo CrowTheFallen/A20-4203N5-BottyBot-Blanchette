@@ -13,8 +13,8 @@ import org.jsoup.helper.Validate;
 import sun.awt.image.ImageWatched;
 import sun.invoke.empty.Empty;
 
-import java.io.File;
-import java.io.IOException;
+import javax.swing.*;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -37,13 +37,13 @@ public class BlanchetteBot
             String Newligne=System.getProperty("line.separator");
             System.out.println(Newligne +"Tout semble en ordre, commençons la recherche! " );
             Dossier(args[2]);
-            Recherche(Integer.parseInt(args[0]),args[1]);
+            Recherche(Integer.parseInt(args[0]),args[1],args[2]);
         }
 
     }
 
 
-    public static void Recherche(int exploration,String url){
+    public static void Recherche(int exploration,String url,String Repertoire){
 
         Set<Web> Listedesites = new HashSet<Web>();
         TestdeRecherche(Listedesites,url,exploration);
@@ -57,7 +57,9 @@ public class BlanchetteBot
                          if (isURL(Site.WebAdress)) {
                              doc = Jsoup.connect(Site.toString()).get();
                              System.out.println("Exploration de la page >> " + Site);
-                             //Elements newsHeadlines = doc.select("html");
+
+
+
                              //System.out.println(newsHeadlines);
                          }
                          else
@@ -72,14 +74,7 @@ public class BlanchetteBot
 
                      }
 
-
-
-
-
-
                  }
-
-
         }
         System.out.println("Nombre de pages explorées : " + Listedesites.stream().count() );
     }
@@ -144,7 +139,6 @@ public class BlanchetteBot
         return Listedesites2;
     }
 
-
     public static boolean isURL(String url) {
         try {
             (new java.net.URL(url)).openStream().close();
@@ -201,6 +195,8 @@ public class BlanchetteBot
         File Dossier = new File(Repertoire);
 
         if (Dossier.exists()) {
+            final File[] files = Dossier.listFiles();
+            for (File f: files) f.delete();
             Dossier.delete();
         }
         Dossier.mkdir();
