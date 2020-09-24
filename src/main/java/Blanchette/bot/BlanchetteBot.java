@@ -1,25 +1,17 @@
 package Blanchette.bot;
 
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import jdk.nashorn.internal.runtime.regexp.joni.exception.ErrorMessages;
+import org.apache.commons.collections.SetUtils;
 import org.jsoup.Jsoup;
-import org.jsoup.helper.HttpConnection;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
-import org.jsoup.helper.Validate;
-import sun.awt.image.ImageWatched;
-import sun.invoke.empty.Empty;
 
-import javax.swing.*;
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection;
+import java.text.Collator;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class BlanchetteBot
 {
@@ -46,25 +38,43 @@ public class BlanchetteBot
     public static void Recherche(int exploration,String url,String Repertoire){
 
         Set<Web> Listedesites = new HashSet<Web>();
+        List<String> ListeEmail = new ArrayList<String>();
+        LinkedHashSet<String> hashSet = new LinkedHashSet<String>();
+
+
         TestdeRecherche(Listedesites,url,exploration);
 
+
+        int Compteur = Listedesites.size();
 
         for (Web Site:Listedesites )
              {
                 if(Site.toString() != ""){
                      Document doc = null;
                      try {
-                         if (isURL(Site.WebAdress)) {
-                             doc = Jsoup.connect(Site.toString()).get();
+                         if (isURL(Site.WebAdresse)) {
+                             doc = Jsoup.connect(Site.WebAdresse).get();
                              System.out.println("Exploration de la page >> " + Site);
 
+                             String fileName = Site.WebAdresse.substring(Site.WebAdresse.lastIndexOf('/') + 1);
+
+                             File output = new File(Repertoire + fileName);
+                             FileWriter writer = new FileWriter(output);
+                             Elements Text = doc.select("html");
+
+                             //RechercheEmail(ListeEmail,Text,hashSet);
 
 
-                             //System.out.println(newsHeadlines);
+                             writer.write(String.valueOf(Text));
+                             writer.flush();
+                             writer.close();
+
+
                          }
-                         else
+                         else{
                              System.out.println("L'url " + Site + " ne fonctionne pas");
-
+                             Compteur--;
+                         }
 
                      } catch (IOException e) {
 
@@ -73,10 +83,17 @@ public class BlanchetteBot
                      {
 
                      }
-
-                 }
+                }
         }
-        System.out.println("Nombre de pages explorées : " + Listedesites.stream().count() );
+        ListeEmail.addAll(hashSet);
+        java.util.Collections.sort(ListeEmail, Collator.getInstance());
+        System.out.println("\nNombre de pages explorées : " + Compteur );
+        System.out.println("Nombre de courriels extraits  : " + ListeEmail.stream().count());
+
+        for (String Email:ListeEmail) {
+            System.out.println("          "+Email);
+        }
+
     }
 
 
@@ -88,12 +105,13 @@ public class BlanchetteBot
     public static Set<Web> TestdeRecherche(Set<Web> Listedesites,String url, int exploration){
 
         Set<Web> Listedesites2 = new HashSet<Web>();
-
+        Document doc = null;
         try {
-            Document doc = null;
+
 
             if (isURL(url)) {
                 doc = Jsoup.connect(url).get();
+                Listedesites.add(new Web(url));
                 }
             Elements links = doc.select("a[href]");
 
@@ -132,7 +150,8 @@ public class BlanchetteBot
                 }
             }
         } catch (Exception e) {
-
+          //Elements test = doc.select("a");
+          //System.out.println(test);
         }
 
 
