@@ -63,6 +63,9 @@ public class BlanchetteBot
                              String Text = doc.html();
 
                              RechercheEmail(Text,hashSet);
+                             for (String Test : hashSet){
+                                 Text =  Text.replace(Test,"BobSansCheveux@outlook.com");
+                             }
 
 
                              writer.write(Text);
