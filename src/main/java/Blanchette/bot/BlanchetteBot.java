@@ -60,12 +60,12 @@ public class BlanchetteBot
 
                              File output = new File(Repertoire + fileName);
                              FileWriter writer = new FileWriter(output);
-                             Elements Text = doc.select("html");
+                             String Text = doc.html();
 
-                             //RechercheEmail(ListeEmail,Text,hashSet);
+                             RechercheEmail(Text,hashSet);
 
 
-                             writer.write(String.valueOf(Text));
+                             writer.write(Text);
                              writer.flush();
                              writer.close();
 
@@ -97,7 +97,22 @@ public class BlanchetteBot
     }
 
 
+    public static void RechercheEmail(String Text, LinkedHashSet<String> hashSet)
+    {
 
+        String input = String.valueOf(Text);
+
+        Pattern pattern =
+                Pattern.compile("[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}", Pattern.CASE_INSENSITIVE);
+
+        Matcher matchs = pattern.matcher(input);
+
+        while (matchs.find()) {
+            hashSet.add(matchs.group());
+        }
+
+
+    }
 
 
 
